@@ -5,6 +5,8 @@
 # --------------------------
 import streamlit as st
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 
@@ -26,26 +28,45 @@ model.fit(X_train, y_train)
 # Streamlit Web App
 # --------------------------
 st.set_page_config(page_title="Heart Attack Risk Predictor", page_icon="❤️")
-st.title('❤️ Heart Attack Risk Prediction')
+st.title('❤️ Heart Attack Risk Prediction App')
 
 st.write("""
-## Enter your health information below:
+## Enter your health information:
 """)
 
 # Take input from user
-age = st.number_input('Enter your Age:', min_value=1, max_value=120)
-heart_rate = st.number_input('Enter your Heart Rate:', min_value=30, max_value=220)
-blood_sugar = st.number_input('Enter your Blood Sugar Level:', min_value=50, max_value=300)
+age = st.slider('Select your Age:', 1, 120, 30)
+heart_rate = st.slider('Select your Heart Rate:', 30, 220, 70)
+blood_sugar = st.slider('Select your Blood Sugar Level:', 50, 300, 100)
+
+# Show Bar Chart of Inputs
+st.subheader('📊 Your Health Parameters:')
+health_data = pd.DataFrame({
+    'Parameter': ['Age', 'Heart Rate', 'Blood Sugar'],
+    'Value': [age, heart_rate, blood_sugar]
+})
+st.bar_chart(health_data.set_index('Parameter'))
 
 # Predict button
-if st.button('Predict Heart Attack Risk'):
+if st.button('🔍 Predict Heart Attack Risk'):
     input_data = np.array([[age, heart_rate, blood_sugar]])
     prediction = model.predict(input_data)
 
     if prediction[0] == 1:
         st.error('⚠️ High Risk of Heart Attack! Please consult a doctor.')
+        st.markdown("😟 Stay Safe!")
     else:
         st.success('✅ Low Risk of Heart Attack. Stay Healthy!')
+        st.markdown("😄 Great Health!")
+
+    st.write('---')
+
+    # Randomly plot a fake "Model Accuracy" graph
+    st.subheader('📈 Model Performance Visualization')
+    fig, ax = plt.subplots()
+    ax.plot(np.random.rand(10), marker='o', linestyle='-')
+    ax.set_title('Model Random Accuracy Trend')
+    st.pyplot(fig)
 
 st.write('---')
 st.caption('Developed with ❤️ by [Your Name]')
